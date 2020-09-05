@@ -27,5 +27,6 @@ class EVSE(cp):
         request = call.HeartbeatPayload()
         while True:
             await self.call(request)
+            print(datetime.utcnow().isoformat(), 'Sent a HeartBeat')
             await asyncio.sleep(interval)
 
