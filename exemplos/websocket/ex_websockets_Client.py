@@ -7,7 +7,8 @@ import websockets
 async def hello(uri):
     async with websockets.connect(uri) as websocket:
         await websocket.send("Hello world!")
-        await websocket.recv()
+        resposta = await websocket.recv()
+        print(resposta)
 
 
 asyncio.get_event_loop().run_until_complete(
