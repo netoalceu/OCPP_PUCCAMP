@@ -3,60 +3,33 @@ import asyncio
 try:
     import websockets
 except ModuleNotFoundError:
-    print("This example relies on the 'websockets' package.")
-    print("Please install it by running: ")
-    print()
-    print(" $ pip install websockets")
+    print(" websocket lib - instalar biblioteca")
     import sys
+
     sys.exit(1)
 
+from electricalVehicleSupplyEquipment import EVSE
 
-from ocpp.v20 import call
-from ocpp.v20 import ChargePoint as cp
-
-
-class ChargePoint(cp):
-
-    async def send_heartbeat(self, interval):
-        request = call.HeartbeatPayload()
-        while True:
-            await self.call(request)
-            await asyncio.sleep(interval)
-
-    async def send_boot_notification(self):
-        request = call.BootNotificationPayload(
-                charging_station={
-                    'model': 'Wallbox XYZ',
-                    'vendor_name': 'anewone'
-                },
-                reason="PowerUp"
-        )
-        response = await self.call(request)
-
-        if response.status == 'Accepted':
-            print("Connected to central system.")
-            await self.send_heartbeat(response.interval)
-
+charge_point_id = 'CP_1'
+url = 'ws://localhost:9000'
 
 async def main():
     async with websockets.connect(
-        'ws://localhost:9000/CP_1',
-        subprotocols=['ocpp2.0']
+            url+'/'+charge_point_id,
+            subprotocols=['ocpp2.0']
     ) as ws:
+        evse = EVSE(charge_point_id, ws)
 
-        cp = ChargePoint('CP_1', ws)
-
-        await asyncio.gather(cp.start(), cp.send_boot_notification())
+        await asyncio.gather(evse.start(), evse.send_boot_notification())
 
 
 if __name__ == '__main__':
+    print("Iniciando EVSE...")
     try:
-        # asyncio.run() is used when running this example with Python 3.7 and
-        # higher.
+        print("...com Python version 3.7 or more")
         asyncio.run(main())
     except AttributeError:
-        # For Python 3.6 a bit more code is required to run the main() task on
-        # an event loop.
+        print("...com Python version 3.6 or less")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(main())
         loop.close()
