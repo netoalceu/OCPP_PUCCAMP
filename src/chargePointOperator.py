@@ -1,35 +1,37 @@
 from datetime import datetime
 
 from ocpp.routing import on, after
-from ocpp.v20 import ChargePoint as cp
-from ocpp.v20 import call_result
-from ocpp.v16.enums import *
+from ocpp.v20 import call_result, ChargePoint as cp
+from ocpp.v16.enums import *  # comferir estes enuns, devido as diferenças de JSON Schema
+from src.timerRegistration import now
+
 
 class ChargePointOperator(cp):
+
     ################## BOOT NOTIFICATION #################
-    @on('BootNotification')
+    @on(Action.BootNotification)
     def on_boot_notification(self, charging_station, reason, **kwargs):
-        print(datetime.utcnow().isoformat(), 'Got a BootNotification!')
+        print(now() + ' Got a BootNotification!')
         return call_result.BootNotificationPayload(
-            current_time=datetime.utcnow().isoformat(),
+            current_time=now(),
             interval=10,
-            status='Accepted'
+            status=RegistrationStatus.accepted
         )
 
-    @after('BootNotification')
+    @after(Action.BootNotification)
     def after_boot_notification(self, charging_station, reason, **kwargs):
         print("Boot Notification from:")
         print("ChargePoint Vendor: ", charging_station)
         print("ChargePoint Model: ", reason)
 
     ################## HEARTBEAT ##########################
-    @on('Heartbeat')
+    @on(Action.Heartbeat)
     def on_heartbeat(self):
-        print(datetime.utcnow().isoformat(), 'On a Heartbeat!')
+        print(now(), ' On a Heartbeat!')
         return call_result.HeartbeatPayload(
-            current_time=datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S') + "Z"
+            current_time=now()
         )
 
-    @after('Heartbeat')
+    @after(Action.Heartbeat)
     def after_heartbeat(self):
-        print(datetime.utcnow().isoformat(), 'After - Heartbeat')
+        print(now(), ' After - Heartbeat')

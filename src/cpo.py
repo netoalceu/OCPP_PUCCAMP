@@ -7,18 +7,19 @@ except ModuleNotFoundError:
     import sys
     sys.exit(1)
 
-from chargePointOperator import ChargePointOperator
+from src.chargePointOperator import ChargePointOperator
 
 valid_tokens = ["a36ef7b0", "1234", "12345", "1111", "2222", 987]
 
 
 async def on_connect(websocket, path):
-    """ For every new charge point that connects, create a ChargePoint instance
-    and start listening for messages.
     """
+    Para cada novo ponto de carga que se conecta, cria-se uma nova instância
+    EVSE e comeca a escutar as mensagens."""
+
     charge_point_id = path.strip('/')
     cp_created = ChargePointOperator(charge_point_id, websocket)
-    print(charge_point_id)
+    print('Conectando com EVSE ', charge_point_id)
 
     await cp_created.start()
 
