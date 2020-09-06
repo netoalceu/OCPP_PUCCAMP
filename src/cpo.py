@@ -9,9 +9,6 @@ except ModuleNotFoundError:
 
 from src.chargePointOperator import ChargePointOperator
 
-valid_tokens = ["a36ef7b0", "1234", "12345", "1111", "2222", 987]
-
-
 async def on_connect(websocket, path):
     """
     Para cada novo ponto de carga que se conecta, cria-se uma nova instância

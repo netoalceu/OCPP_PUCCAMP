@@ -7,9 +7,10 @@ from ocpp.v16 import call, call_result, ChargePoint as cp
 # from ocpp.v16.enums import Action, RegistrationStatus, AuthorizationStatus
 from ocpp.v16.enums import *
 
-#as do not use database, implement an array were you can find
-#all the valid tokens
-valid_tokens = ["a36ef7b0","1234","12345","1111","2222",987]
+# as do not use database, implement an array were you can find
+# all the valid tokens
+valid_tokens = ["a36ef7b0", "1234", "12345", "1111", "2222", 987]
+
 
 class ChargePoint_listener(cp):
     # ### START TEMPLATE ##
@@ -41,7 +42,7 @@ class ChargePoint_listener(cp):
     def after_boot_notification(self, charge_point_vendor, charge_point_model, **kwargs):
         print("Boot Notification from:")
         print("ChargePoint Vendor: ", charge_point_vendor)
-        print("ChargePoint Model: ",charge_point_model)
+        print("ChargePoint Model: ", charge_point_model)
 
     ################## HEARTBEAT ##########################
     @on(Action.Heartbeat)
@@ -60,13 +61,13 @@ class ChargePoint_listener(cp):
         if id_tag in valid_tokens:
             return call_result.AuthorizePayload(
                 id_tag_info={
-                    "status" : AuthorizationStatus.accepted
+                    "status": AuthorizationStatus.accepted
                 }
             )
         else:
             return call_result.AuthorizePayload(
                 id_tag_info={
-                    "status" : AuthorizationStatus.invalid
+                    "status": AuthorizationStatus.invalid
                 }
             )
 
@@ -79,15 +80,18 @@ class ChargePoint_listener(cp):
     def on_start_transaction(self, connector_id, id_tag, meter_start, timestamp):
         trans_id = 987
         return call_result.StartTransactionPayload(
-            transaction_id = trans_id,
+            transaction_id=trans_id,
             id_tag_info={
-                "status" : AuthorizationStatus.accepted
+                "status": AuthorizationStatus.accepted
             }
         )
 
     @after(Action.StartTransaction)
     def after_start_transaction(self, connector_id, id_tag, meter_start, timestamp):
-        print("Started transaction in connector {}, from {}, starting meter: {}, timestamp {}".format(connector_id, id_tag, meter_start, timestamp))
+        print("Started transaction in connector {}, from {}, starting meter: {}, timestamp {}".format(connector_id,
+                                                                                                      id_tag,
+                                                                                                      meter_start,
+                                                                                                      timestamp))
 
     ################## METER VALUES ##########################
     @on(Action.MeterValues)
@@ -110,7 +114,7 @@ class ChargePoint_listener(cp):
 
     @after(Action.StopTransaction)
     def after_stop_transaction(self, meter_stop, timestamp, transaction_id):
-        print("Stop transaction ", transaction_id, "meter value: ", meter_stop )
+        print("Stop transaction ", transaction_id, "meter value: ", meter_stop)
 
     ################## change ##########################
     @on(Action.ChangeAvailability)
@@ -127,12 +131,12 @@ class ChargePoint_listener(cp):
     async def send_remote_start_transaction(self, id_tag_cs):
 
         request = call.RemoteStartTransactionPayload(
-            id_tag = id_tag_cs
+            id_tag=id_tag_cs
         )
 
         response = await self.call(request)
 
-        if response.status ==  RemoteStartStopStatus.accepted:
+        if response.status == RemoteStartStopStatus.accepted:
             print("Start remote transaction accepted from charge point!")
         else:
             print("Start remote transaction rejected from charge point!")
@@ -141,12 +145,12 @@ class ChargePoint_listener(cp):
     async def send_remote_end_transaction(self, transaction_id_cs):
 
         request = call.RemoteStopTransactionPayload(
-            transaction_id = transaction_id_cs
+            transaction_id=transaction_id_cs
         )
 
         response = await self.call(request)
 
-        if response.status ==  RemoteStartStopStatus.accepted:
+        if response.status == RemoteStartStopStatus.accepted:
             print("Stop remote transaction accepted from charge point!")
         else:
             print("Stop remote transaction rejected from charge point!")
@@ -159,12 +163,13 @@ async def remote_test(cp):
     # id_tag_cs = "2222"
     # _ = await cp.send_remote_start_transaction(id_tag_cs)
     # print('remote start sended')
-    #---------------------------------------------
+    # ---------------------------------------------
     print('End remote transaction test')
     await asyncio.sleep(50)
     transaction_id_cs = 987
     _ = await cp.send_remote_end_transaction(transaction_id_cs)
     print('remote end sended')
+
 
 async def on_connect(websocket, path):
     """ For every new charge point that connects, create a ChargePoint instance
@@ -175,9 +180,9 @@ async def on_connect(websocket, path):
     cp_created = ChargePoint_listener(charge_point_id, websocket)
 
     await asyncio.gather(
-                cp_created.start(),
-                remote_test(cp_created),
-                )
+        cp_created.start(),
+        remote_test(cp_created),
+    )
     # await cp.start()
     print('after cp.start')
 
@@ -193,6 +198,7 @@ async def main():
     print('between server and wait')
     await server.wait_closed()
     print('after wait_closed')
+
 
 if __name__ == '__main__':
     asyncio.run(main())
