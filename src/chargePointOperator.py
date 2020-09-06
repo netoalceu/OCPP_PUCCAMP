@@ -79,6 +79,15 @@ class ChargePointOperator(cp):
                                                                                                       meter_start,
                                                                                                       timestamp))
     """
+    ################## METER VALUES ##########################
+    @on(Action.MeterValues)
+    def on_meter_values(self, evse_id, meter_value):
+        return call_result.MeterValuesPayload(
+        )
+
+    @after(Action.MeterValues)
+    def after_meter_values(self, evse_id, meter_value):
+        print("Received meter values")
 
     """
     ################## STOP TRANSACTION ##########################
