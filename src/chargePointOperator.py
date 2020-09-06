@@ -103,3 +103,14 @@ class ChargePointOperator(cp):
     def after_stop_transaction(self, meter_stop, timestamp, transaction_id):
         print("Stop transaction ", transaction_id, "meter value: ", meter_stop)
     """
+    ############## CHANGE AVAILABILITY #######################
+    @on(Action.ChangeAvailability)
+    def on_change_availability(self, evse_id, operational_status):
+        return call_result.ChangeAvailabilityPayload(
+            status=AvailabilityStatus.accepted
+        )
+
+    @after(Action.ChangeAvailability)
+    def after_change_availability(self, evse_id, operational_status):
+        print("Change avilability ready")
+
