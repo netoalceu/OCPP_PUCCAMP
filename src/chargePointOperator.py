@@ -59,3 +59,38 @@ class ChargePointOperator(cp):
     @after(Action.Authorize)
     def after_authorize(self, id_token):
         print("Authorization requested from: ", id_token)
+
+    """
+    ################## START TRANSACTION ##########################
+    @on(Action.StartTransaction)
+    def on_start_transaction(self, connector_id, id_tag, meter_start, timestamp):
+        trans_id = 987
+        return call_result.StartTransactionPayload(
+            transaction_id=trans_id,
+            id_tag_info={
+                "status": AuthorizationStatus.accepted
+            }
+        )
+
+    @after(Action.StartTransaction)
+    def after_start_transaction(self, connector_id, id_tag, meter_start, timestamp):
+        print("Started transaction in connector {}, from {}, starting meter: {}, timestamp {}".format(connector_id,
+                                                                                                      id_tag,
+                                                                                                      meter_start,
+                                                                                                      timestamp))
+    """
+
+    """
+    ################## STOP TRANSACTION ##########################
+    @on(Action.StopTransaction)
+    def on_stop_transaction(self, meter_stop, timestamp, transaction_id):
+        return call_result.StopTransactionPayload(
+            # id_tag_info={
+            #     "status" : AuthorizationStatus.accepted
+            # }
+        )
+
+    @after(Action.StopTransaction)
+    def after_stop_transaction(self, meter_stop, timestamp, transaction_id):
+        print("Stop transaction ", transaction_id, "meter value: ", meter_stop)
+    """
