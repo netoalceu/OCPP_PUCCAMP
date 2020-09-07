@@ -1,13 +1,16 @@
 import asyncio
+from src.tools import cpo_ip, cpo_port, subprotocol
 
 try:
     import websockets
 except ModuleNotFoundError:
     print(" websocket lib - instalar biblioteca")
     import sys
+
     sys.exit(1)
 
 from src.chargePointOperator import ChargePointOperator
+
 
 async def on_connect(websocket, path):
     """
@@ -18,19 +21,19 @@ async def on_connect(websocket, path):
     cp_created = ChargePointOperator(charge_point_id, websocket)
     print('Conectando com EVSE ', charge_point_id)
 
-    await cp_created.start()
-
+    try:
+        await cp_created.start()
+    except:
+        print('Fim da conexão com ' + charge_point_id + '....')
 
 async def main():
     server = await websockets.serve(
         on_connect,
-        '0.0.0.0',
-        9000,
-        subprotocols=['ocpp 2.0']
+        cpo_ip,
+        cpo_port,
+        subprotocols=subprotocol
     )
-
     await server.wait_closed()
-
 
 if __name__ == '__main__':
     print("Iniciando Servidor...")

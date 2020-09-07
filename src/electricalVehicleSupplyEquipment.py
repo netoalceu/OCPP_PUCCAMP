@@ -1,8 +1,7 @@
 import asyncio
-from datetime import datetime
-
-from ocpp.v20 import call
-from ocpp.v20 import ChargePoint as cp
+from ocpp.v20 import call, ChargePoint as cp
+from src.tools import now
+from src.enumsV20 import *
 
 
 class EVSE(cp):
@@ -15,10 +14,10 @@ class EVSE(cp):
                 },
                 reason="PowerUp"
         )
-        print(datetime.utcnow().isoformat(), 'Sent a BootNotification!')
+        print(now(), 'Sent a BootNotification!')
 
         response = await self.call(request)
-        if response.status == 'Accepted':
+        if response.status == RegistrationStatus.accepted:
             print("Connected to central system.")
             await self.send_heartbeat(response.interval)
 
@@ -27,6 +26,6 @@ class EVSE(cp):
         request = call.HeartbeatPayload()
         while True:
             await self.call(request)
-            print(datetime.utcnow().isoformat(), 'Sent a HeartBeat')
+            print(now(), 'Sent a HeartBeat')
             await asyncio.sleep(interval)
 

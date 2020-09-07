@@ -1,4 +1,5 @@
 import asyncio
+from src.tools import *
 
 try:
     import websockets
@@ -8,19 +9,17 @@ except ModuleNotFoundError:
 
     sys.exit(1)
 
-from electricalVehicleSupplyEquipment import EVSE
+from src.electricalVehicleSupplyEquipment import EVSE
 
-charge_point_id = 'CP_1'
-url = 'ws://localhost:9000'
 
 async def main():
     async with websockets.connect(
-            url+'/'+charge_point_id,
-            subprotocols=['ocpp2.0']
+            evse_url + evse_station_id,
+            subprotocols=subprotocol
     ) as ws:
-        evse = EVSE(charge_point_id, ws)
+        cs = EVSE(evse_station_id, ws)
 
-        await asyncio.gather(evse.start(), evse.send_boot_notification())
+        await asyncio.gather(cs.start(), cs.send_boot_notification())
 
 
 if __name__ == '__main__':
