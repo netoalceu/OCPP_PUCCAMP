@@ -1,34 +1,24 @@
 import asyncio
-from src.tools import *
-
-try:
-    import websockets
-except ModuleNotFoundError:
-    print(" websocket lib - instalar biblioteca")
-    import sys
-
-    sys.exit(1)
-
+import websockets
 from src.electricalVehicleSupplyEquipment import EVSE
+from src.tools import CHARGER_URL, SUBPROTOCOL, CP_ID, CP_MODEL, CP_VENDOR
 
 
 async def main():
+    """
+    Inicializa-se os EVSEs individualmente. Sendo necessario somente
+    a mudança do CHARGER_ID.
+    """
     async with websockets.connect(
-            evse_url + evse_station_id,
-            subprotocols=subprotocol
+            CHARGER_URL + CP_ID,
+            subprotocols=SUBPROTOCOL
     ) as ws:
-        cs = EVSE(evse_station_id, ws)
-
-        await asyncio.gather(cs.start(), cs.send_boot_notification())
+        cs = EVSE(CP_ID, ws)
+        await asyncio.gather(cs.start(), cs.send_boot_notification(
+            CP_MODEL,
+            CP_VENDOR))
 
 
 if __name__ == '__main__':
-    print("Iniciando EVSE...")
-    try:
-        print("...com Python version 3.7 or more")
-        asyncio.run(main())
-    except AttributeError:
-        print("...com Python version 3.6 or less")
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
-        loop.close()
+    print('Iniciando EVSE ' + CP_ID)
+    asyncio.run(main())

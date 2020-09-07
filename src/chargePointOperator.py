@@ -1,9 +1,10 @@
 from ocpp.routing import on, after
-from ocpp.v20 import call, call_result, ChargePoint as cp
-from src.tools import now
+from ocpp.v20 import call_result, ChargePoint as cp
+from src.tools import now, HEARTBEAT_INTERVAL
 from src.enumsV20 import *
 
 valid_tokens = ["a36ef7b0", "1234", "12345", "1111", "2222", 987]
+
 
 class ChargePointOperator(cp):
 
@@ -13,17 +14,16 @@ class ChargePointOperator(cp):
         print(now() + ' Got a BootNotification!')
         return call_result.BootNotificationPayload(
             current_time=now(),
-            interval=10,
+            interval=HEARTBEAT_INTERVAL,
             status=RegistrationStatus.accepted
         )
 
     @after(Action.BootNotification)
     def after_boot_notification(self, charging_station, reason, **kwargs):
-        print("Boot Notification from:")
-        print("ChargePoint Vendor: ", charging_station)
-        print("ChargePoint Model: ", reason)
+        print(now(), " Boot Notification from: ", charging_station, ", cause ", reason)
 
     ################## HEARTBEAT ##########################
+
     @on(Action.Heartbeat)
     def on_heartbeat(self):
         print(now(), ' On a Heartbeat!')
@@ -31,9 +31,11 @@ class ChargePointOperator(cp):
             current_time=now()
         )
 
+    """
     @after(Action.Heartbeat)
     def after_heartbeat(self):
         print(now(), ' After - Heartbeat')
+    """
 
     ################## AUTHORIZE ##########################
     @on(Action.Authorize)
@@ -76,6 +78,7 @@ class ChargePointOperator(cp):
                                                                                                       meter_start,
                                                                                                       timestamp))
     """
+
     ################## METER VALUES ##########################
     @on(Action.MeterValues)
     def on_meter_values(self, evse_id, meter_value):
@@ -100,6 +103,7 @@ class ChargePointOperator(cp):
     def after_stop_transaction(self, meter_stop, timestamp, transaction_id):
         print("Stop transaction ", transaction_id, "meter value: ", meter_stop)
     """
+
     ############## CHANGE AVAILABILITY #######################
     @on(Action.ChangeAvailability)
     def on_change_availability(self, evse_id, operational_status):
@@ -110,6 +114,7 @@ class ChargePointOperator(cp):
     @after(Action.ChangeAvailability)
     def after_change_availability(self, evse_id, operational_status):
         print("Change avilability ready")
+
     """
     ################# REMOTE START TRANSACTION ##################
     async def send_remote_start_transaction(self, id_tag_cs):
@@ -139,4 +144,3 @@ class ChargePointOperator(cp):
         else:
             print("Stop remote transaction rejected from charge point!")
     """
-
