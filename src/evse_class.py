@@ -16,6 +16,10 @@ class evseClass:
     METER_VALUES = 0
     CHARGING = False
 
+    # Variaveis do EVSE para teste
+    flag_boot_notification = False
+    teste_contador = 0
+
     def __init__(self):
         self.CP_ID = 'CP_01'
         self.SUBPROTOCOL = ['ocpp2.0']
@@ -25,7 +29,7 @@ class evseClass:
         self.ENCODER = True
         self.CP_MODEL = "openEVSE-V1"
         self.CP_VENDOR = "Alceu"
-        self.HEARTBEAT_INTERVAL = 10
+        self.HEARTBEAT_INTERVAL = 5
         self.RFID_VALUE = "1234"
         self.CONNECTOR_ID = 1
         self.AUTHORIZED = False

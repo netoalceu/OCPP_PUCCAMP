@@ -1,5 +1,12 @@
-from time import sleep
+import asyncio
+from ocpp.v20 import call, ChargePoint as cp
+from src.tools import now
+from src.enumsV20 import *
+from src.tools import now
+from src.evse_class import evseClass
+
 count = 0
+
 
 class fsm:
     end_state = 0
@@ -10,32 +17,33 @@ class fsm:
     stop_transaction = 5
 
 
-def init_state():  # Init State
-    print('Iniciando o  InitState')
+def init_state(info_do_carregador):  # Init State
+    print(now(),'Iniciando o  InitState')
     # Gerenciamento de Transições
-    sleep(0.1)
+    print(now(), 'Boot Notification is', info_do_carregador.flag_boot_notification)
+    if not info_do_carregador.flag_boot_notification:
+        return fsm.init_state
     return fsm.authentication
 
 
-def authentication():
-    print('Iniciando o  Authentication')
+def authentication(info_do_carregador):
+    print(now(), 'Iniciando o  Authentication')
     # Gerenciamento de Transições
-    sleep(0.1)
     return fsm.start_transaction
 
 
-def start_transaction():
-    print('Iniciando o  start_transaction')
+def start_transaction(info_do_carregador):
+    print(now(), 'Iniciando o  start_transaction')
     # Gerenciamento de Transições
-    sleep(0.1)
+    global count
+    count = 0
     return fsm.measuring
 
 
-def measuring():
+def measuring(info_do_carregador):
     global count
-    print('Iniciando o  Measuring', count)
+    print(now(), 'Measuring...', count)
     # Gerenciamento de Transições
-    sleep(0.1)
     if count >= 2:
         return fsm.stop_transaction
     else:
@@ -43,21 +51,19 @@ def measuring():
         return fsm.measuring
 
 
-def stop_transaction():
-    print('Iniciando o  StopTransaction')
+def stop_transaction(info_do_carregador):
+    print(now(), 'Iniciando o  StopTransaction')
     # Gerenciamento de Transições
-    sleep(0.1)
     return fsm.authentication
 
 
-def end_state():  # end State
-    print('Iniciando o  end_state')
-    sleep(0.1)
+def end_state(info_do_carregador):  # end State
+    print(now(), 'Iniciando o  end_state')
     return fsm.init_state
 
 
 # Finite State Machine (FSM)
-def FSM(estado):
+def FSM(estado_do_carregador, info_do_carregador):
     switch = {
         0: end_state,
         1: init_state,
@@ -66,12 +72,23 @@ def FSM(estado):
         4: measuring,
         5: stop_transaction,
     }
-    func = switch.get(estado, lambda: None)
-    return func()
+    func = switch.get(estado_do_carregador, lambda: None)
+    return func(info_do_carregador)
 
 
-# Programa Principal
-estado = fsm.init_state
-while estado:
-    estado = FSM(estado)
-    sleep(2)
+async def state_machine_process(info_do_carregador):
+    # Programa Principal
+    estado_do_carregador = fsm.init_state
+    await asyncio.sleep(1)
+    while estado_do_carregador:
+        estado_do_carregador = FSM(estado_do_carregador, info_do_carregador)
+        await asyncio.sleep(1)
+
+if __name__ == '__main__':
+    # Programa Principal
+    from time import sleep
+    estado_do_carregador = fsm.init_state
+    info_do_carregador = evseClass()
+    while estado_do_carregador:
+        estado_do_carregador = FSM(estado_do_carregador, info_do_carregador)
+        sleep(2)

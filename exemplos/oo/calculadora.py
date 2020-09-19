@@ -1,5 +1,5 @@
-#calculadora.py
-class Calculadora:
+# calculadora.py
+class calculadora:
 
     def __init__(self, a, b):
         self.a = a
@@ -17,7 +17,8 @@ class Calculadora:
     def divide(self):
         return self.a / self.b
 
-class Calculadora_v2:
+
+class calculadora_v2:
 
     def soma(self, a, b):
         return a + b
