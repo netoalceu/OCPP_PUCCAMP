@@ -29,7 +29,7 @@ class evseClass:
         self.ENCODER = True
         self.CP_MODEL = "openEVSE-V1"
         self.CP_VENDOR = "Alceu"
-        self.HEARTBEAT_INTERVAL = 5
+        self.HEARTBEAT_INTERVAL = 120
         self.RFID_VALUE = "1234"
         self.CONNECTOR_ID = 1
         self.AUTHORIZED = False

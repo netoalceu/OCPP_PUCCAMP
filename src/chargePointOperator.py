@@ -40,107 +40,65 @@ class ChargePointOperator(cp):
     ################## AUTHORIZE ##########################
     @on(Action.Authorize)
     def on_authorize(self, id_token):
-        if id_token in valid_tokens:
+        if id_token['id_token'] in valid_tokens:
+            print(now(), 'Token Accepted')
             return call_result.AuthorizePayload(
                 id_token_info={
-                    "status": AuthorizationStatus.accepted},
-                certificate_status='',
-                evse_id=[]
+                    "status": AuthorizationStatus.accepted}
             )
         else:
+            print(now(), 'Token Invalid')
             return call_result.AuthorizePayload(
                 id_token_info={
-                    "status": AuthorizationStatus.invalid},
-                certificate_status='',
-                evse_id=[]
+                    "status": AuthorizationStatus.invalid}
             )
 
+    """
     @after(Action.Authorize)
     def after_authorize(self, id_token):
         print("Authorization requested from: ", id_token)
-
     """
-    ################## START TRANSACTION ##########################
-    @on(Action.StartTransaction)
-    def on_start_transaction(self, connector_id, id_tag, meter_start, timestamp):
-        trans_id = 987
-        return call_result.StartTransactionPayload(
-            transaction_id=trans_id,
-            id_tag_info={
-                "status": AuthorizationStatus.accepted
-            }
-        )
 
-    @after(Action.StartTransaction)
+    ################## START TRANSACTION ####################
+    @on(Action.RequestStartTransaction)
+    def on_request_start_transaction(self, remote_start_id, id_token):
+        if id_token['id_token'] == '123':
+            print(now(), 'Starting Transaction')
+            return call_result.RequestStartTransactionPayload(
+                status=AvailabilityStatus.accepted
+            )
+        else:
+            print(now(), 'Wrong ID_Token. Transaction did not initiate')
+            return call_result.RequestStartTransactionPayload(
+                status=AvailabilityStatus.rejected
+            )
+    """
+    @after(Action.RequestStartTransaction)
     def after_start_transaction(self, connector_id, id_tag, meter_start, timestamp):
         print("Started transaction in connector {}, from {}, starting meter: {}, timestamp {}".format(connector_id,
-                                                                                                      id_tag,
-                                                                                                      meter_start,
-                                                                                                      timestamp))
     """
 
     ################## METER VALUES ##########################
     @on(Action.MeterValues)
     def on_meter_values(self, evse_id, meter_value):
+        print(now(), evse_id, meter_value)
         return call_result.MeterValuesPayload(
         )
-
+    """
     @after(Action.MeterValues)
     def after_meter_values(self, evse_id, meter_value):
         print("Received meter values")
-
     """
+
     ################## STOP TRANSACTION ##########################
-    @on(Action.StopTransaction)
-    def on_stop_transaction(self, meter_stop, timestamp, transaction_id):
-        return call_result.StopTransactionPayload(
-            # id_tag_info={
-            #     "status" : AuthorizationStatus.accepted
-            # }
-        )
-
-    @after(Action.StopTransaction)
-    def after_stop_transaction(self, meter_stop, timestamp, transaction_id):
-        print("Stop transaction ", transaction_id, "meter value: ", meter_stop)
-    """
-
-    ############## CHANGE AVAILABILITY #######################
-    @on(Action.ChangeAvailability)
-    def on_change_availability(self, evse_id, operational_status):
-        return call_result.ChangeAvailabilityPayload(
+    @on(Action.RequestStopTransaction)
+    def on_request_stop_transaction(self, transaction_id):
+        print(now(), 'Finished Transaction', transaction_id)
+        return call_result.RequestStopTransactionPayload(
             status=AvailabilityStatus.accepted
         )
-
-    @after(Action.ChangeAvailability)
-    def after_change_availability(self, evse_id, operational_status):
-        print("Change avilability ready")
-
     """
-    ################# REMOTE START TRANSACTION ##################
-    async def send_remote_start_transaction(self, id_tag_cs):
-
-        request = call.RemoteStartTransactionPayload(
-            id_tag=id_tag_cs
-        )
-
-        response = await self.call(request)
-
-        if response.status == RemoteStartStopStatus.accepted:
-            print("Start remote transaction accepted from charge point!")
-        else:
-            print("Start remote transaction rejected from charge point!")
-
-    ################# REMOTE END TRANSACTION ##################
-    async def send_remote_end_transaction(self, transaction_id_cs):
-
-        request = call.RemoteStopTransactionPayload(
-            transaction_id=transaction_id_cs
-        )
-
-        response = await self.call(request)
-
-        if response.status == RemoteStartStopStatus.accepted:
-            print("Stop remote transaction accepted from charge point!")
-        else:
-            print("Stop remote transaction rejected from charge point!")
+    @after(Action.RequestStopTransaction)
+    def after_request_stop_transaction(self, meter_stop, timestamp, transaction_id):
+        print("Stop transaction ", transaction_id, "meter value: ", meter_stop)
     """
