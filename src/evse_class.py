@@ -18,7 +18,9 @@ class evseClass:
 
     # Variaveis do EVSE para teste
     flag_boot_notification = False
-    teste_contador = 0
+    contador_numero_medicoes = 1000
+    ciclo_unico_da_maquina_de_estado = True
+    parar_heartbeat = False
 
     def __init__(self):
         self.CP_ID = 'CP_01'

@@ -11,7 +11,7 @@ class ChargePointOperator(cp):
     ################## BOOT NOTIFICATION #################
     @on(Action.BootNotification)
     def on_boot_notification(self, charging_station, reason, **kwargs):
-        print(now() + ' Got a BootNotification!')
+        print(now(), ' Got a BootNotification!')
         return call_result.BootNotificationPayload(
             current_time=now(),
             interval=HEARTBEAT_INTERVAL,

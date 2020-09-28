@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 from src.chargePointOperator import ChargePointOperator
-from src.tools import CPO_IP, CPO_PORT, SUBPROTOCOL
+from src.tools import now, CPO_IP, CPO_PORT, SUBPROTOCOL
 
 async def on_connect(websocket, path):
     """
@@ -11,12 +11,12 @@ async def on_connect(websocket, path):
 
     charge_point_id = path.strip('/')
     cp_created = ChargePointOperator(charge_point_id, websocket)
-    print('Conectando com EVSE ', charge_point_id)
+    print(now(), 'Conectando com EVSE ', charge_point_id)
 
     try:
         await cp_created.start()
     except:
-        print('Fim da conexão com ' + charge_point_id + '....')
+        print(now(), 'Fim da conexão com ' + charge_point_id + '....')
 
 async def main():
     server = await websockets.serve(
@@ -28,5 +28,5 @@ async def main():
     await server.wait_closed()
 
 if __name__ == '__main__':
-    print("Iniciando Servidor...")
+    print(now(), "Iniciando Servidor...")
     asyncio.run(main())

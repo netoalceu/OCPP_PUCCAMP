@@ -34,15 +34,24 @@ async def main():
     ) as ws:
         cs = EVSE(carregador.CP_ID, ws)
 
-        #await asyncio.gather(cs.start(), evaluation(carregador, cs))
-
+        # await asyncio.gather(cs.start(), evaluation(carregador, cs))
 
         await asyncio.gather(
             cs.start(),
             cs.send_boot_notification(carregador),
             smp(carregador, cs)
         )
+        """
+        await asyncio.gather(
+            cs.start(),
+            cs.send_boot_notification(carregador)
+        )
+        """
+
 
 if __name__ == '__main__':
     print('Iniciando EVSE ' + cp_id)
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except:
+        print(now(), 'Fechando EVSE' + cp_id)
