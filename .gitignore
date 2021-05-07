@@ -1,6 +1,7 @@
 Documents
 tools/
 .idea/
+resultados/
 
 # dotenv
 .env
