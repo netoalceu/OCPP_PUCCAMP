@@ -8,7 +8,7 @@
 #
 # Author: Richard Bullington-McGuire <richard@moduscreate.com>
 # Author: Mike Schwartz <mike@moduscreate.com>
-#https://gist.github.com/obscurerichard/3740206
+#
 # Copyright 2012 Modus Create, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining 
@@ -31,8 +31,11 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 VERSION=0.1
-device=eth0
+#device=eth0
+device=enp0s8
+#bandwidth=100kbps
 bandwidth=1Gbps
+#latency=350ms
 latency=1ms
 packetloss=
 command=slow
@@ -249,7 +252,7 @@ case $command in
     echo '       slow status'
     echo
     echo '"network-type" type can be:'
-    echo '  AMPS'
+    echo '  GPRS'
     echo '  GSM'
     echo '  EDGE'
     echo '  2.5G'

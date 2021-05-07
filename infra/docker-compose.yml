@@ -1,0 +1,3 @@
+#container_or_service_name:
+#    cap_add:
+#      - NET_ADMIN

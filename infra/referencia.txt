@@ -1,0 +1,46 @@
+comando para Criar a imagem infra com o dockerfile
+docker build -t netoalceu/infra:1.0 .
+
+Comando para criar as redes Bridges (como é uma bridge, esta na mesma faixa de ip)
+docker network create --driver=bridge --subnet=192.168.10.0/24 --ip-range=192.168.10.0/24 --gateway=192.168.10.254 net_cpo
+docker network create --driver=bridge --subnet=192.168.20.0/24 --ip-range=192.168.20.0/24 --gateway=192.168.20.254 net_evse
+
+comando p criar o container qos
+docker run -it -d --name=qos --network=net_cpo --cap-add=NET_ADMIN netoalceu/infra:1.0 /bin/bash
+docker network connect net_evse qos
+docker cp ~/workspace/infra/slow.sh qos:/usr/local/sbin/
+
+Provavel estrutura de rede de qos:
+net_cpo     eth0    192.168.10.1    192.168.10.0    /24   
+net_evse    eth1    192.168.20.1    192.168.20.0    /24
+
+comando p criar o container cpo
+docker run -it -d --name=cpo --network=net_cpo --cap-add=NET_ADMIN netoalceu/infra:1.0 /bin/bash
+route add default gw 192.168.10.1
+route del default gw 192.168.10.254
+
+comando p criar o container evse
+docker run -it -d --name=evse --network=net_evse --cap-add=NET_ADMIN netoalceu/infra:1.0 /bin/bash
+route add default gw 192.168.20.1
+route del default gw 192.168.20.254
+
+
+
+Referencias NETEM para documentação:
+https://wiki.linuxfoundation.org/networking/netem
+https://netbeez.net/blog/how-to-use-the-linux-traffic-control/
+
+
+Comando de teste NETEM
+Ativa Delay
+tc qdisc add dev br-535e40d88071 root netem delay 100ms
+
+Desativa NETEM
+tc qdisc del dev br-535e40d88071 root
+
+Verifica as regras implementadas 
+tc qdisc show
+
+copiando os arquivos do container para o host
+docker cp qos:/tmp/. ~/workspace/infra/resultados/
+
