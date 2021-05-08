@@ -1,7 +1,7 @@
 asyncio==3.4.3
 websockets==8.1
 ocpp==0.6.4
-aiohttp==3.6.2
+aiohttp==3.7.4
 websocket==0.2.1
 SimpleWebSocketServer==0.1.1
 jsonschema==3.2.0
