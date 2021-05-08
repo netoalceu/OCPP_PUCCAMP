@@ -44,3 +44,18 @@ tc qdisc show
 copiando os arquivos do container para o host
 docker cp qos:/tmp/. ~/workspace/infra/resultados/
 
+
+
+
+Passagem de parametros para o EVSE 
+CHARGER_URL = 'ws://localhost:9000/'
+CP_ID = 'CP_01'
+MEASUREMENT_REPLY = 1000
+
+como ler parametros no python
+for param in sys.argv:
+    print(param)
+
+Como ler Variaveis de ambiente do linux no python
+import os
+PATH = os.environ['PATH']

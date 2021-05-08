@@ -1,4 +1,6 @@
 import asyncio
+import sys
+
 from ocpp.v20 import call, ChargePoint as cp
 from src.tools import now
 from src.enumsV20 import *
@@ -43,7 +45,7 @@ async def start_transaction(info_do_carregador, protocol):
     print(now(), 'Iniciando o  start_transaction')
     # Gerenciamento de Transições
     global count
-    count = info_do_carregador.contador_numero_medicoes
+    count = info_do_carregador.contador_numero_medicoes - 1
     await protocol.send_request_start_transaction('123')
     return fsm.measuring
 
@@ -70,14 +72,13 @@ async def stop_transaction(info_do_carregador, protocol):
 async def end_state(info_do_carregador, protocol):  # end State
     print(now(), 'Iniciando o  end_state')
     info_do_carregador.parar_heartbeat = True
-    await asyncio.sleep(2)
+    await asyncio.sleep(0.1)
     protocol.fechar_arquivo_log()
     return fsm.fim
 
 
 async def fim(info_do_carregador, protocol):  # end State
-    print(now(), 'Iniciando o  end_state')
-    await asyncio.sleep(2)
+    print(now(), 'Iniciando o  fim')
     return True
 
 
@@ -103,6 +104,8 @@ async def state_machine_process(info_do_carregador, protocol):
     while estado_do_carregador:
         estado_do_carregador = await FSM(estado_do_carregador, info_do_carregador, protocol)
         await asyncio.sleep(0.1)
+    info_do_carregador.fsm_parado = True
+    return True
 
 
 if __name__ == '__main__':

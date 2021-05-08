@@ -72,6 +72,7 @@ class EVSE(cp):
                 print(now(), "Heartbeat not delivered")
             print(now(), "Heartbeat feedback in EVSE")
             await asyncio.sleep(info_do_carregador.HEARTBEAT_INTERVAL)
+        info_do_carregador.heartbeat_parado = True
         return True
     ################## AUTHORIZE ##########################
     async def send_authorize(self, id):
