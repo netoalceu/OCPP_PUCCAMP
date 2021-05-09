@@ -18,7 +18,7 @@ class evseClass:
 
     # Variaveis do EVSE para teste
     flag_boot_notification = False
-    contador_numero_medicoes = 10
+    QNT_METER = 10
     ciclo_unico_da_maquina_de_estado = True
     parar_heartbeat = False
     heartbeat_parado = False

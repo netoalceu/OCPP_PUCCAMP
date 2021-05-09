@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import time
 
@@ -13,6 +14,13 @@ def get_time():
 
 def now():
     return datetime.utcnow().isoformat()
+
+def is_environ_exist(env):
+    try:
+        var = os.environ[env]
+        return var
+    except:
+        return ""
 
 
 if __name__ == '__main__':

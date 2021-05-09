@@ -6,7 +6,7 @@ import websockets
 from src.electricalVehicleSupplyEquipment import EVSE
 from src.evse_class import evseClass
 from src.evse_state_machine import state_machine_process as smp
-from src.tools import now
+from src.tools import *
 
 cp_id = ''
 
@@ -37,13 +37,24 @@ async def main():
     global cp_id
     carregador=evseClass()
 
-    #checar se as variaveis de ambiente existem.
-    #Se nao existirem, usar padrao do sw
-    #env_qnt_meter = os.environ['QNT_METER']
-    #print(env_qnt_meter)
+    cp_id = is_environ_exist("CP_ID")
+    if not cp_id:
+        cp_id = carregador.CP_ID
+    else:
+        carregador.CP_ID = cp_id
 
+    qnt_meter = is_environ_exist("QNT_METER")
+    if not qnt_meter:
+        qnt_meter = carregador.QNT_METER
+    else:
+        carregador.QNT_METER = int(qnt_meter)
 
-    cp_id = carregador.CP_ID
+    charger_url = is_environ_exist("CHARGER_URL")
+    if not charger_url:
+        charger_url = carregador.CHARGER_URL
+    else:
+        carregador.CHARGER_URL = charger_url
+
     async with websockets.connect(
             carregador.CHARGER_URL + carregador.CP_ID,
             subprotocols=carregador.SUBPROTOCOL

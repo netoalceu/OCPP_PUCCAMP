@@ -45,7 +45,7 @@ async def start_transaction(info_do_carregador, protocol):
     print(now(), 'Iniciando o  start_transaction')
     # Gerenciamento de Transições
     global count
-    count = info_do_carregador.contador_numero_medicoes - 1
+    count = info_do_carregador.QNT_METER - 1
     await protocol.send_request_start_transaction('123')
     return fsm.measuring
 
