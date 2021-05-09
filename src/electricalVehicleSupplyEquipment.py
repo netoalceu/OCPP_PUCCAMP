@@ -9,13 +9,13 @@ class EVSE(cp):
 
     def __init__(self, id, connection, response_timeout=30):
         super().__init__(id, connection, response_timeout)
-        self.arquivo = open('log.txt', 'w')
+        self.arquivo = open("log.txt", 'w')
         self.arquivo.close()
         self.abrir_arquivo_log()
         self.tempo_inicial = 0
 
     def abrir_arquivo_log(self):
-        self.arquivo = open('log.txt', 'a')
+        self.arquivo = open("log.txt", 'a')
         return True
 
     def iniciar_timer_log(self):

@@ -10,7 +10,6 @@ from src.tools import now
 
 cp_id = ''
 
-
 async def evaluation(info_do_carregador, protocol):
     print('inicio de avaliação de funções de teste')
     while True:
@@ -26,7 +25,7 @@ async def func_check_to_close(info_do_carregador,protocol):
         await asyncio.sleep(0.1)
         if info_do_carregador.heartbeat_parado and info_do_carregador.fsm_parado:
             loop = asyncio.get_event_loop
-            loop.run_until_complete (main())
+            loop.run_until_complete(main())
             loop.close()
 
 
@@ -36,7 +35,14 @@ async def main():
     a mudança do CHARGER_ID.
     """
     global cp_id
-    carregador = evseClass()
+    carregador=evseClass()
+
+    #checar se as variaveis de ambiente existem.
+    #Se nao existirem, usar padrao do sw
+    #env_qnt_meter = os.environ['QNT_METER']
+    #print(env_qnt_meter)
+
+
     cp_id = carregador.CP_ID
     async with websockets.connect(
             carregador.CHARGER_URL + carregador.CP_ID,
@@ -68,6 +74,5 @@ if __name__ == '__main__':
     print('Iniciando EVSE ' + cp_id)
     try:
         asyncio.run(main())
-        print("so para testar")
     except:
         print(now(), 'Fechando EVSE ' + cp_id)

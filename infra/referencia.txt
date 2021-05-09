@@ -1,12 +1,35 @@
+
+docker run -it -d \
+    --name=qos \
+    --network=net_cpo \
+    --volume evse_log:/app/log \
+    --cap-add=NET_ADMIN \
+    ubuntu:latest /bin/bash
+
+
+=======================================================================================================
 comando para Criar a imagem infra com o dockerfile
 docker build -t netoalceu/infra:1.0 .
+
 
 Comando para criar as redes Bridges (como é uma bridge, esta na mesma faixa de ip)
 docker network create --driver=bridge --subnet=192.168.10.0/24 --ip-range=192.168.10.0/24 --gateway=192.168.10.254 net_cpo
 docker network create --driver=bridge --subnet=192.168.20.0/24 --ip-range=192.168.20.0/24 --gateway=192.168.20.254 net_evse
 
+comando para criar volumes compartilhados para salvar logs
+docker volume create ocpp_log
+
+diretorio de referencia do volume no container:
+ocpp_log:/app/log
+
 comando p criar o container qos
-docker run -it -d --name=qos --network=net_cpo --cap-add=NET_ADMIN netoalceu/infra:1.0 /bin/bash
+docker run -it -d \
+    --name=qos \
+    --network=net_cpo \
+    --vol ocpp_log:/app/log \
+    --cap-add=NET_ADMIN \
+    netoalceu/infra:1.0 /bin/bash
+
 docker network connect net_evse qos
 docker cp ~/workspace/infra/slow.sh qos:/usr/local/sbin/
 
@@ -15,12 +38,25 @@ net_cpo     eth0    192.168.10.1    192.168.10.0    /24
 net_evse    eth1    192.168.20.1    192.168.20.0    /24
 
 comando p criar o container cpo
-docker run -it -d --name=cpo --network=net_cpo --cap-add=NET_ADMIN netoalceu/infra:1.0 /bin/bash
+docker run -it -d \
+    --name=cpo \
+    --network=net_cpo \
+    --volume ocpp_log:/app/log \
+
+    --cap-add=NET_ADMIN \
+    netoalceu/infra:1.0 /bin/bash
+
 route add default gw 192.168.10.1
 route del default gw 192.168.10.254
 
 comando p criar o container evse
-docker run -it -d --name=evse --network=net_evse --cap-add=NET_ADMIN netoalceu/infra:1.0 /bin/bash
+docker run -it -d \
+    --name=evse \
+    --network=net_evse \ 
+    --volume evse_log:/app/log \
+    --cap-add=NET_ADMIN \
+    netoalceu/infra:1.0 /bin/bash
+
 route add default gw 192.168.20.1
 route del default gw 192.168.20.254
 
@@ -59,3 +95,8 @@ for param in sys.argv:
 Como ler Variaveis de ambiente do linux no python
 import os
 PATH = os.environ['PATH']
+
+Variaveis a serem criadas:
+export CHARGER_URL="ws://localhost:9000/"
+export QNT_METER=10
+export CP_ID=CP_teste
