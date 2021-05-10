@@ -25,3 +25,10 @@ echo "======================"
 echo
 
 python3 $OCPP_APP
+
+echo
+echo "======================"
+echo "  Salvando log    "
+echo "======================"
+echo
+mv log.txt ./log/$CP_ID.txt

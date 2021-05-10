@@ -112,6 +112,13 @@ docker run -it \
     --cap-add=NET_ADMIN \
     netoalceu/ocpp:1.0 /bin/bash
 
+
+route add default gw 192.168.10.1
+route del default gw 192.168.10.254
+
+docker commit --change 'CMD ["python3", "cpo_main.py"]' \
+    cpo netoalceu/cpo:1.0
+
 comando p criar o container evse
 docker run -it \
     --volume ocpp_log:/app/log \
@@ -122,6 +129,11 @@ docker run -it \
     --workdir /app \
     --rm \
     netoalceu/ocpp:1.0 python3 evse_main.py
+
+
+route add default gw 192.168.20.1
+route del default gw 192.168.20.254
+python3 evse_main.py
 
 =====================================
    comando p criar o container qos
@@ -150,13 +162,6 @@ docker run -it \
     --rm \
     netoalceu/ocpp:1.0 /app/start.sh
 
-route add default gw 192.168.10.1
-route del default gw 192.168.10.254
-
-docker commit --change 'CMD ["python3", "cpo_main.py"]' \
-    cpo netoalceu/cpo:1.0
-
-
 =====================================
    comando p criar o container evse
 =====================================
@@ -165,13 +170,12 @@ docker run -it \
     --volume ocpp_log:/app/log \
     --cap-add=NET_ADMIN \
     --env CP_ID=CP_01 \
+    --env QNT_METER=10 \
+    --env CHARGER_URL="ws://192.168.10.2:9000/" \
     --workdir /app \
     --rm \
+    netoalceu/ocpp:1.0 /bin/bash
     netoalceu/ocpp:1.0 /app/start.sh
-    
-route add default gw 192.168.20.1
-route del default gw 192.168.20.254
-python3 evse_main.py
 
 
 
