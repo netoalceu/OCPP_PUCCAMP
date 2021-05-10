@@ -9,7 +9,7 @@ docker run -it -d \
 
 =======================================================================================================
 comando para Criar a imagem infra com o dockerfile
-docker build -t netoalceu/infra:1.0 .
+docker build -t netoalceu/infra:1.1 .
 
 
 Comando para criar as redes Bridges (como é uma bridge, esta na mesma faixa de ip)
@@ -42,7 +42,6 @@ docker run -it -d \
     --name=cpo \
     --network=net_cpo \
     --volume ocpp_log:/app/log \
-
     --cap-add=NET_ADMIN \
     netoalceu/infra:1.0 /bin/bash
 
@@ -96,7 +95,86 @@ Como ler Variaveis de ambiente do linux no python
 import os
 PATH = os.environ['PATH']
 
+
+=============================================================================================
+
 Variaveis a serem criadas:
-export CHARGER_URL="ws://localhost:9000/"
-export QNT_METER=10
+export CHARGER_URL="ws://172.17.0.2:9000/"
+export QNT_METER=1000
 export CP_ID=CP_teste
+
+
+==============================================================================================
+comando p criar o container cpo
+docker run -it \
+    --name=cpo \
+    --volume ocpp_log:/app/log \
+    --cap-add=NET_ADMIN \
+    netoalceu/ocpp:1.0 /bin/bash
+
+comando p criar o container evse
+docker run -it \
+    --volume ocpp_log:/app/log \
+    --cap-add=NET_ADMIN \
+    --env CHARGER_URL="ws://172.17.0.2:9000/" \
+    --env QNT_METER=1000 \
+    --env CP_ID=CP_0 \
+    --workdir /app \
+    --rm \
+    netoalceu/ocpp:1.0 python3 evse_main.py
+
+=====================================
+   comando p criar o container qos
+=====================================
+docker run -it -d \
+    --name=qos \
+    --network=net_cpo \
+    --volume ocpp_log:/tmp \
+    --cap-add=NET_ADMIN \
+    netoalceu/infra:1.1 /bin/bash
+docker network connect net_evse qos
+
+
+
+=====================================
+   comando p criar o container cpo
+=====================================
+docker run -it \
+    --name=cpo \
+    --network=net_cpo \
+    --volume ocpp_log:/app/log \
+    --cap-add=NET_ADMIN \
+    --env ADD_GATEWAY=192.168.10.1 \
+    --env DEL_GATEWAY=192.168.10.254 \
+    --env OCPP_APP=cpo_main.py \
+    --rm \
+    netoalceu/ocpp:1.0 /app/start.sh
+
+route add default gw 192.168.10.1
+route del default gw 192.168.10.254
+
+docker commit --change 'CMD ["python3", "cpo_main.py"]' \
+    cpo netoalceu/cpo:1.0
+
+
+=====================================
+   comando p criar o container evse
+=====================================
+docker run -it \
+    --network=net_evse \
+    --volume ocpp_log:/app/log \
+    --cap-add=NET_ADMIN \
+    --env CP_ID=CP_01 \
+    --workdir /app \
+    --rm \
+    netoalceu/ocpp:1.0 /app/start.sh
+    
+route add default gw 192.168.20.1
+route del default gw 192.168.20.254
+python3 evse_main.py
+
+
+
+
+
+
