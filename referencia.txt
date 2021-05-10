@@ -182,3 +182,8 @@ docker run -it \
 
 
 
+Eixo x	Reference	AMPS	GPRS	3G	4G	Vsat    DSL	WI-FI_AG
+
+copiar os resultados:
+docker cp qos:/tmp/ /home/alceu/workspace/OCPP_PUCCAMP/resultados/app_docker/$QOS
+

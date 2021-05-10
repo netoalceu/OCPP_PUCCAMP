@@ -17,7 +17,7 @@ RUN apt update && apt install -y python3-pip -y && pip3 install asyncio==3.4.3 \
 COPY /src /app/src
 COPY cpo_main.py /app
 COPY evse_main.py /app
-COPY start.sh /app
+COPY /scripts/start.sh /app
 
 #Variaveis de Ambiente EVSE (Padrão)
 ENV CHARGER_URL="ws://172.17.0.2:9000/"
