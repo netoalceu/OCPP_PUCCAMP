@@ -1,5 +1,5 @@
 asyncio==3.4.3
-websockets==8.1
+websockets==9.1
 ocpp==0.6.4
 aiohttp==3.6.2
 websocket==0.2.1
